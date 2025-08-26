@@ -1,0 +1,20 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Project Configuration
+project_name = "matcarv"
+
+# Network Configuration
+vpc_cidr = "192.168.1.0/24"
+
+# EC2 Configuration
+instance_type = "t3a.small"
+
+# RDS Configuration
+db_instance_class = "db.t4g.small"
+db_name          = "matcarvdb"
+db_username      = "admin"
+
+# Domain Configuration
+domain_name = "app.matcarv.com.br"
+zone_name   = "matcarv.com.br"
