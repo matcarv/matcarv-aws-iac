@@ -1,18 +1,3 @@
-# KMS Key for RDS encryption
-resource "aws_kms_key" "rds" {
-  description             = "KMS key for RDS encryption"
-  deletion_window_in_days = 7
-
-  tags = {
-    Name = "${var.project_name}-rds-key"
-  }
-}
-
-resource "aws_kms_alias" "rds" {
-  name          = "alias/${var.project_name}-rds"
-  target_key_id = aws_kms_key.rds.key_id
-}
-
 # DB Subnet Group
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-db-subnet-group"

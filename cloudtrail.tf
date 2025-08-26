@@ -52,48 +52,6 @@ resource "aws_iam_role_policy" "cloudtrail_logs" {
   })
 }
 
-# KMS Key for CloudTrail
-resource "aws_kms_key" "cloudtrail" {
-  description             = "KMS key for CloudTrail encryption"
-  deletion_window_in_days = 7
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "Enable IAM User Permissions"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        }
-        Action   = "kms:*"
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow CloudTrail to encrypt logs"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        }
-        Action = [
-          "kms:GenerateDataKey*",
-          "kms:DescribeKey"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-
-  tags = {
-    Name = "${var.project_name}-cloudtrail-key"
-  }
-}
-
-resource "aws_kms_alias" "cloudtrail" {
-  name          = "alias/${var.project_name}-cloudtrail"
-  target_key_id = aws_kms_key.cloudtrail.key_id
-}
-
 # CloudTrail
 resource "aws_cloudtrail" "main" {
   name           = "${var.project_name}-cloudtrail"

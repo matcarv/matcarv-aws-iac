@@ -176,6 +176,7 @@ terraform destroy
 ├── variables.tf              # Definição de variáveis
 ├── outputs.tf                # Outputs da infraestrutura
 ├── security_groups.tf        # Security Groups
+├── kms.tf                    # Chaves KMS para criptografia
 ├── ec2.tf                    # Configuração do EC2 e Auto Scaling
 ├── rds.tf                    # Configuração do RDS MySQL
 ├── alb.tf                    # Application Load Balancer e SSL

@@ -1,18 +1,3 @@
-# KMS Key for EBS encryption
-resource "aws_kms_key" "ebs" {
-  description             = "KMS key for EBS encryption"
-  deletion_window_in_days = 7
-
-  tags = {
-    Name = "${var.project_name}-ebs-key"
-  }
-}
-
-resource "aws_kms_alias" "ebs" {
-  name          = "alias/${var.project_name}-ebs"
-  target_key_id = aws_kms_key.ebs.key_id
-}
-
 # Launch Template
 resource "aws_launch_template" "main" {
   name_prefix   = "${var.project_name}-"
