@@ -1,11 +1,22 @@
 # Provider Configuration
 terraform {
   required_version = ">= 1.0"
+  
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+  }
+
+  # Remote State Backend
+  backend "s3" {
+    bucket         = "matcarv-terraform-state"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    profile        = "matcarv"
+    dynamodb_table = "matcarv-terraform-locks"
+    encrypt        = true
   }
 }
 

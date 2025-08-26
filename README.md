@@ -67,6 +67,7 @@ A infraestrutura provisiona os seguintes recursos:
 2. **AWS CLI**: Configurado com o profile `matcarv`
 3. **Zona Route53**: `matcarv.com.br` deve existir na conta AWS
 4. **Certificado SSL**: Certificado wildcard `*.matcarv.com.br` deve estar disponível no ACM **na região us-east-1 (Norte da Virgínia)**
+5. **Remote State**: Bucket S3 e tabela DynamoDB para armazenar o estado do Terraform
 
 ### ⚠️ Importante sobre o Certificado SSL
 O certificado SSL deve estar na mesma região da infraestrutura (us-east-1). Se você possui o certificado em outra região:
@@ -74,6 +75,12 @@ O certificado SSL deve estar na mesma região da infraestrutura (us-east-1). Se 
 1. **Opção 1**: Solicitar um novo certificado na região us-east-1
 2. **Opção 2**: Alterar a região da infraestrutura para onde o certificado existe
 3. **Opção 3**: Temporariamente comentar as configurações HTTPS no `alb.tf` para deploy inicial
+
+### 🗄️ Remote State
+Este projeto utiliza **Remote State** com backend S3 para:
+- **Armazenar o estado**: Bucket S3 `matcarv-terraform-state`
+- **Controle de concorrência**: Tabela DynamoDB `matcarv-terraform-locks`
+- **Segurança**: Estado criptografado e versionado
 
 ## Configuração
 
@@ -83,12 +90,17 @@ git clone <repository-url>
 cd matcarv-aws-iac
 ```
 
-2. Copie o arquivo de variáveis de exemplo:
+2. Configure o Remote State (primeira vez apenas):
+```bash
+./setup-remote-state.sh
+```
+
+3. Copie o arquivo de variáveis de exemplo:
 ```bash
 cp terraform.tfvars.example terraform.tfvars
 ```
 
-3. Edite o arquivo `terraform.tfvars` conforme necessário.
+4. Edite o arquivo `terraform.tfvars` conforme necessário.
 
 ## Deploy
 
@@ -111,6 +123,47 @@ terraform plan
 ```bash
 terraform apply
 ```
+
+## Remote State
+
+### 🗄️ Configuração do Backend Remoto
+Este projeto utiliza **S3 Backend** para armazenar o estado do Terraform de forma segura e colaborativa:
+
+#### **Recursos do Remote State:**
+- **Bucket S3**: `matcarv-terraform-state`
+  - Versionamento habilitado
+  - Criptografia AES256
+  - Acesso público bloqueado
+- **Tabela DynamoDB**: `matcarv-terraform-locks`
+  - Controle de concorrência
+  - Prevenção de conflitos em equipe
+  - Locking automático durante operações
+
+#### **Benefícios:**
+- ✅ **Colaboração**: Múltiplos desenvolvedores podem trabalhar no mesmo projeto
+- ✅ **Segurança**: Estado criptografado e versionado
+- ✅ **Backup**: Histórico completo de mudanças
+- ✅ **Locking**: Previne operações simultâneas conflitantes
+- ✅ **Auditoria**: Rastreamento de todas as modificações
+
+#### **Configuração Inicial:**
+```bash
+# Execute apenas uma vez para configurar o backend
+./setup-remote-state.sh
+```
+
+#### **Migração do Estado Local:**
+Se você já tem um estado local, o Terraform perguntará se deseja migrar:
+```bash
+terraform init
+# Responda 'yes' quando perguntado sobre migração
+```
+
+#### **⚠️ Importante:**
+- Execute `setup-remote-state.sh` **apenas uma vez** por projeto
+- Mantenha o bucket S3 e tabela DynamoDB seguros
+- **Nunca delete** estes recursos sem fazer backup do estado
+- O estado contém informações sensíveis (senhas, chaves, etc.)
 
 ## Acesso à Aplicação
 
@@ -183,6 +236,7 @@ terraform destroy
 ├── route53.tf                # Configuração do Route53
 ├── s3.tf                     # Bucket S3 para logs
 ├── cloudtrail.tf             # CloudTrail e CloudWatch Logs
+├── setup-remote-state.sh     # Script para configurar Remote State
 ├── terraform.tfvars.example  # Exemplo de variáveis
 └── .gitignore               # Arquivos ignorados pelo Git
 ```
