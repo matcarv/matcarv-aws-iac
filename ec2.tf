@@ -16,13 +16,13 @@ resource "aws_kms_alias" "ebs" {
 # Launch Template
 resource "aws_launch_template" "main" {
   name_prefix   = "${var.project_name}-"
-  image_id      = data.aws_ami.amazon_linux.id
+  image_id      = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
   vpc_security_group_ids = [aws_security_group.ec2.id]
 
   block_device_mappings {
-    device_name = "/dev/xvda"
+    device_name = "/dev/sda1"
     ebs {
       volume_size = 20
       volume_type = "gp3"
@@ -33,11 +33,13 @@ resource "aws_launch_template" "main" {
 
   user_data = base64encode(<<-EOF
               #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "<h1>Hello from ${var.project_name}!</h1>" > /var/www/html/index.html
+              apt-get update -y
+              apt-get install -y apache2
+              systemctl start apache2
+              systemctl enable apache2
+              echo "<h1>Hello from ${var.project_name} on Ubuntu!</h1>" > /var/www/html/index.html
+              echo "<p>Server: $(hostname)</p>" >> /var/www/html/index.html
+              echo "<p>Date: $(date)</p>" >> /var/www/html/index.html
               EOF
   )
 

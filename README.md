@@ -16,7 +16,7 @@ A infraestrutura provisiona os seguintes recursos:
 
 ### Computação
 - **EC2**: Instância t3a.small com Auto Scaling Group
-- **Launch Template**: Configurado com Amazon Linux 2
+- **Launch Template**: Configurado com Ubuntu 22.04 LTS
 - **EBS**: Volume criptografado com KMS
 - **User Data**: Instalação e configuração do Apache HTTP Server
 
