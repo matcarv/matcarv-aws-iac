@@ -58,7 +58,7 @@ resource "aws_db_instance" "main" {
   max_allocated_storage = 100
   storage_type          = "gp3"
   storage_encrypted     = true
-  kms_key_id           = aws_kms_key.rds.arn
+  kms_key_id            = aws_kms_key.rds.arn
 
   # Database
   db_name  = var.db_name
@@ -72,8 +72,8 @@ resource "aws_db_instance" "main" {
 
   # Backup
   backup_retention_period = 7
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "sun:04:00-sun:05:00"
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "sun:04:00-sun:05:00"
 
   # Monitoring
   monitoring_interval = 60

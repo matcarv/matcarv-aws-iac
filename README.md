@@ -52,7 +52,14 @@ A infraestrutura provisiona os seguintes recursos:
 1. **Terraform**: Versão >= 1.0
 2. **AWS CLI**: Configurado com o profile `matcarv`
 3. **Zona Route53**: `matcarv.com.br` deve existir na conta AWS
-4. **Certificado SSL**: Certificado wildcard `*.matcarv.com.br` deve estar disponível no ACM
+4. **Certificado SSL**: Certificado wildcard `*.matcarv.com.br` deve estar disponível no ACM **na região us-east-1 (Norte da Virgínia)**
+
+### ⚠️ Importante sobre o Certificado SSL
+O certificado SSL deve estar na mesma região da infraestrutura (us-east-1). Se você possui o certificado em outra região:
+
+1. **Opção 1**: Solicitar um novo certificado na região us-east-1
+2. **Opção 2**: Alterar a região da infraestrutura para onde o certificado existe
+3. **Opção 3**: Temporariamente comentar as configurações HTTPS no `alb.tf` para deploy inicial
 
 ## Configuração
 
