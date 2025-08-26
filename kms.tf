@@ -3,9 +3,11 @@ resource "aws_kms_key" "ebs" {
   description             = "KMS key for EBS encryption"
   deletion_window_in_days = 7
 
-  tags = {
-    Name = "${var.project_name}-ebs-key"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-ebs-key"
+    Description = "KMS key for encrypting EBS volumes"
+    Service     = "EBS"
+  })
 }
 
 resource "aws_kms_alias" "ebs" {
@@ -18,9 +20,11 @@ resource "aws_kms_key" "rds" {
   description             = "KMS key for RDS encryption"
   deletion_window_in_days = 7
 
-  tags = {
-    Name = "${var.project_name}-rds-key"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-rds-key"
+    Description = "KMS key for encrypting RDS database"
+    Service     = "RDS"
+  })
 }
 
 resource "aws_kms_alias" "rds" {
@@ -60,9 +64,11 @@ resource "aws_kms_key" "cloudtrail" {
     ]
   })
 
-  tags = {
-    Name = "${var.project_name}-cloudtrail-key"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-cloudtrail-key"
+    Description = "KMS key for encrypting CloudTrail logs"
+    Service     = "CloudTrail"
+  })
 }
 
 resource "aws_kms_alias" "cloudtrail" {

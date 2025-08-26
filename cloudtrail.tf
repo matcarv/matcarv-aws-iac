@@ -3,9 +3,11 @@ resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/${var.project_name}"
   retention_in_days = 30
 
-  tags = {
-    Name = "${var.project_name}-cloudtrail-logs"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-cloudtrail-logs"
+    Description = "CloudWatch log group for CloudTrail logs"
+    Service     = "CloudWatch"
+  })
 }
 
 # IAM Role for CloudTrail to CloudWatch Logs
@@ -25,9 +27,11 @@ resource "aws_iam_role" "cloudtrail_logs" {
     ]
   })
 
-  tags = {
-    Name = "${var.project_name}-cloudtrail-logs-role"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-cloudtrail-logs-role"
+    Description = "IAM role for CloudTrail to write to CloudWatch Logs"
+    Service     = "CloudTrail"
+  })
 }
 
 # IAM Policy for CloudTrail to CloudWatch Logs
@@ -79,7 +83,9 @@ resource "aws_cloudtrail" "main" {
   include_global_service_events = true
   is_multi_region_trail         = true
 
-  tags = {
-    Name = "${var.project_name}-cloudtrail"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-cloudtrail"
+    Description = "CloudTrail for auditing API calls with S3 and CloudWatch logging"
+    Service     = "CloudTrail"
+  })
 }

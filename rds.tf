@@ -3,9 +3,10 @@ resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-db-subnet-group"
   subnet_ids = aws_subnet.private[*].id
 
-  tags = {
-    Name = "${var.project_name}-db-subnet-group"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-db-subnet-group"
+    Description = "Subnet group for RDS database in private subnets"
+  })
 }
 
 # Random password for RDS
@@ -24,9 +25,10 @@ resource "aws_db_parameter_group" "main" {
     value = "{DBInstanceClassMemory*3/4}"
   }
 
-  tags = {
-    Name = "${var.project_name}-db-params"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-db-params"
+    Description = "Parameter group for MySQL 8.0 database optimization"
+  })
 }
 
 # RDS Instance
@@ -43,7 +45,7 @@ resource "aws_db_instance" "main" {
   max_allocated_storage = 100
   storage_type          = "gp3"
   storage_encrypted     = true
-  kms_key_id            = aws_kms_key.rds.arn
+  kms_key_id           = aws_kms_key.rds.arn
 
   # Database
   db_name  = var.db_name
@@ -57,8 +59,8 @@ resource "aws_db_instance" "main" {
 
   # Backup
   backup_retention_period = 7
-  backup_window           = "03:00-04:00"
-  maintenance_window      = "sun:04:00-sun:05:00"
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "sun:04:00-sun:05:00"
 
   # Monitoring
   monitoring_interval = 60
@@ -71,9 +73,12 @@ resource "aws_db_instance" "main" {
   deletion_protection = false
   skip_final_snapshot = true
 
-  tags = {
-    Name = "${var.project_name}-database"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-database"
+    Description = "MySQL 8.0 database with encryption and automated backups"
+    Service     = "Database"
+    Engine      = "MySQL"
+  })
 }
 
 # IAM Role for RDS Enhanced Monitoring
@@ -93,9 +98,11 @@ resource "aws_iam_role" "rds_monitoring" {
     ]
   })
 
-  tags = {
-    Name = "${var.project_name}-rds-monitoring-role"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-rds-monitoring-role"
+    Description = "IAM role for RDS Enhanced Monitoring"
+    Service     = "RDS"
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "rds_monitoring" {

@@ -14,9 +14,11 @@ resource "aws_lb" "main" {
     enabled = true
   }
 
-  tags = {
-    Name = "${var.project_name}-alb"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-alb"
+    Description = "Application Load Balancer with SSL termination and access logging"
+    Service     = "LoadBalancer"
+  })
 }
 
 # Target Group
@@ -38,9 +40,11 @@ resource "aws_lb_target_group" "main" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name = "${var.project_name}-tg"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-tg"
+    Description = "Target group for web servers with health checks"
+    Service     = "LoadBalancer"
+  })
 }
 
 # ALB Listener HTTP (redirect to HTTPS)
@@ -58,6 +62,11 @@ resource "aws_lb_listener" "http" {
       status_code = "HTTP_301"
     }
   }
+
+  tags = merge(local.common_tags, {
+    Description = "HTTP listener that redirects to HTTPS"
+    Service     = "LoadBalancer"
+  })
 }
 
 # ALB Listener HTTPS
@@ -72,4 +81,9 @@ resource "aws_lb_listener" "https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.main.arn
   }
+
+  tags = merge(local.common_tags, {
+    Description = "HTTPS listener with SSL certificate"
+    Service     = "LoadBalancer"
+  })
 }

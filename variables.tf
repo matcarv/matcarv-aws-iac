@@ -51,3 +51,13 @@ variable "zone_name" {
   type        = string
   default     = "matcarv.com.br"
 }
+
+# Common tags for all resources
+locals {
+  common_tags = {
+    Project     = var.project_name
+    Environment = "production"
+    CreatedDate = "2025-08-26"
+    ManagedBy   = "Terraform"
+  }
+}

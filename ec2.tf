@@ -30,14 +30,17 @@ resource "aws_launch_template" "main" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = {
-      Name = "${var.project_name}-instance"
-    }
+    tags = merge(local.common_tags, {
+      Name        = "${var.project_name}-instance"
+      Description = "Web server instance running Ubuntu with Apache"
+      Service     = "WebServer"
+    })
   }
 
-  tags = {
-    Name = "${var.project_name}-launch-template"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-launch-template"
+    Description = "Launch template for EC2 instances with Ubuntu and Apache"
+  })
 }
 
 # Auto Scaling Group
@@ -61,5 +64,35 @@ resource "aws_autoscaling_group" "main" {
     key                 = "Name"
     value               = "${var.project_name}-asg"
     propagate_at_launch = false
+  }
+
+  tag {
+    key                 = "Description"
+    value               = "Auto Scaling Group for web servers"
+    propagate_at_launch = false
+  }
+
+  tag {
+    key                 = "Project"
+    value               = var.project_name
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = "production"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "CreatedDate"
+    value               = "2025-08-26"
+    propagate_at_launch = false
+  }
+
+  tag {
+    key                 = "ManagedBy"
+    value               = "Terraform"
+    propagate_at_launch = true
   }
 }

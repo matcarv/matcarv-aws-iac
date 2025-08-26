@@ -2,11 +2,12 @@
 resource "aws_s3_bucket" "logs" {
   bucket = "${var.project_name}-logs"
 
-  tags = {
+  tags = merge(local.common_tags, {
     Name        = "${var.project_name}-logs"
-    Environment = "production"
-    Purpose     = "logs"
-  }
+    Description = "S3 bucket for storing ALB and CloudTrail logs"
+    Service     = "Storage"
+    Purpose     = "Logs"
+  })
 }
 
 # S3 Bucket Versioning

@@ -26,9 +26,10 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.project_name}-alb-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-alb-sg"
+    Description = "Security group for Application Load Balancer - allows HTTP/HTTPS traffic"
+  })
 }
 
 # Security Group for EC2
@@ -51,9 +52,10 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.project_name}-ec2-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-ec2-sg"
+    Description = "Security group for EC2 instances - allows HTTP traffic from ALB only"
+  })
 }
 
 # Security Group for RDS
@@ -69,7 +71,8 @@ resource "aws_security_group" "rds" {
     security_groups = [aws_security_group.ec2.id]
   }
 
-  tags = {
-    Name = "${var.project_name}-rds-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name        = "${var.project_name}-rds-sg"
+    Description = "Security group for RDS MySQL - allows access from EC2 instances only"
+  })
 }
