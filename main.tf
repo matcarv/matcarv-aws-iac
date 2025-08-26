@@ -23,6 +23,8 @@ data "aws_route53_zone" "main" {
   name = "matcarv.com.br"
 }
 
+data "aws_caller_identity" "current" {}
+
 # Get latest Ubuntu LTS AMI
 data "aws_ami" "ubuntu" {
   most_recent = true

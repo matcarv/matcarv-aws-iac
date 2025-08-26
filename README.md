@@ -33,6 +33,20 @@ A infraestrutura provisiona os seguintes recursos:
 - **Health Checks**: Monitoramento da saúde das instâncias
 - **SSL/TLS**: Certificado wildcard *.matcarv.com.br via ACM
 - **Redirecionamento**: HTTP (80) → HTTPS (443)
+- **Access Logs**: Habilitado para bucket S3 matcarv-logs
+
+### Armazenamento e Logs
+- **S3 Bucket**: matcarv-logs para armazenar logs do ALB e CloudTrail
+- **Criptografia S3**: AES256 server-side encryption
+- **Lifecycle Policy**: Retenção de 90 dias para logs
+- **Versionamento**: Habilitado com retenção de 30 dias para versões antigas
+
+### Auditoria e Monitoramento
+- **CloudTrail**: Auditoria completa de API calls
+- **CloudWatch Logs**: Logs do CloudTrail com retenção de 30 dias
+- **KMS Encryption**: Logs do CloudTrail criptografados
+- **Multi-Region**: CloudTrail configurado para todas as regiões
+- **Data Events**: Monitoramento de eventos S3
 
 ### DNS
 - **Route53**: Registro A para app.matcarv.com.br
@@ -96,11 +110,6 @@ terraform plan
 4. Aplique a infraestrutura:
 ```bash
 terraform apply
-```
-
-Ou use o script automatizado:
-```bash
-./deploy.sh
 ```
 
 ## Acesso à Aplicação
@@ -171,8 +180,9 @@ terraform destroy
 ├── rds.tf                    # Configuração do RDS MySQL
 ├── alb.tf                    # Application Load Balancer e SSL
 ├── route53.tf                # Configuração do Route53
+├── s3.tf                     # Bucket S3 para logs
+├── cloudtrail.tf             # CloudTrail e CloudWatch Logs
 ├── terraform.tfvars.example  # Exemplo de variáveis
-├── deploy.sh                 # Script de deploy automatizado
 └── .gitignore               # Arquivos ignorados pelo Git
 ```
 

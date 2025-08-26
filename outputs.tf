@@ -38,6 +38,31 @@ output "ssl_certificate_arn" {
   value       = data.aws_acm_certificate.main.arn
 }
 
+output "s3_logs_bucket_name" {
+  description = "Name of the S3 bucket for logs"
+  value       = aws_s3_bucket.logs.bucket
+}
+
+output "s3_logs_bucket_arn" {
+  description = "ARN of the S3 bucket for logs"
+  value       = aws_s3_bucket.logs.arn
+}
+
+output "cloudtrail_name" {
+  description = "Name of the CloudTrail"
+  value       = aws_cloudtrail.main.name
+}
+
+output "cloudtrail_arn" {
+  description = "ARN of the CloudTrail"
+  value       = aws_cloudtrail.main.arn
+}
+
+output "cloudwatch_log_group_name" {
+  description = "Name of the CloudWatch Log Group for CloudTrail"
+  value       = aws_cloudwatch_log_group.cloudtrail.name
+}
+
 output "rds_endpoint" {
   description = "RDS instance endpoint"
   value       = aws_db_instance.main.endpoint
@@ -68,4 +93,9 @@ output "kms_key_ebs_arn" {
 output "kms_key_rds_arn" {
   description = "ARN of the KMS key for RDS encryption"
   value       = aws_kms_key.rds.arn
+}
+
+output "kms_key_cloudtrail_arn" {
+  description = "ARN of the KMS key for CloudTrail encryption"
+  value       = aws_kms_key.cloudtrail.arn
 }
