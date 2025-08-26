@@ -44,6 +44,9 @@ A infraestrutura provisiona os seguintes recursos:
 ### Auditoria e Monitoramento
 - **CloudTrail**: Auditoria completa de API calls
 - **CloudWatch Logs**: Logs do CloudTrail com retenção de 30 dias
+- **CloudWatch Dashboard**: Painel de monitoramento da infraestrutura
+- **CloudWatch Alarms**: Alertas para métricas críticas
+- **CloudWatch Agent**: Monitoramento detalhado de EC2 (CPU, memória, disco)
 - **KMS Encryption**: Logs do CloudTrail criptografados
 - **Multi-Region**: CloudTrail configurado para todas as regiões
 - **Data Events**: Monitoramento de eventos S3
@@ -174,9 +177,53 @@ Após o deploy, a aplicação estará disponível em:
 
 ## Monitoramento
 
-- **CloudWatch**: Métricas automáticas para EC2, RDS e ALB
-- **RDS Enhanced Monitoring**: Métricas detalhadas do banco de dados
-- **Health Checks**: Verificação automática da saúde das instâncias
+### 📊 CloudWatch Dashboard
+A infraestrutura inclui um dashboard completo do CloudWatch com:
+
+#### **Métricas do EC2:**
+- **CPU Utilization**: Monitoramento de uso de CPU das instâncias
+- **Memory Utilization**: Uso de memória (via CloudWatch Agent)
+- **Network In/Out**: Tráfego de rede das instâncias
+- **Disk Usage**: Utilização de disco
+
+#### **Métricas do RDS:**
+- **CPU Utilization**: Uso de CPU do banco de dados
+- **Database Connections**: Número de conexões ativas
+- **Free Storage Space**: Espaço livre em disco
+- **Read/Write IOPS**: Operações de I/O por segundo
+- **Read/Write Latency**: Latência de operações de leitura/escrita
+
+#### **Métricas do ALB:**
+- **Request Count**: Número de requisições
+- **Target Response Time**: Tempo de resposta dos targets
+- **Healthy/Unhealthy Hosts**: Status dos hosts
+
+#### **Métricas do Auto Scaling:**
+- **Group Desired Capacity**: Capacidade desejada
+- **Group In Service Instances**: Instâncias em serviço
+- **Group Total Instances**: Total de instâncias
+
+### 🚨 CloudWatch Alarms
+Alarmes configurados para métricas críticas:
+
+- **EC2 High CPU**: Alerta quando CPU > 80%
+- **RDS High CPU**: Alerta quando CPU do RDS > 80%
+- **RDS Low Storage**: Alerta quando storage < 2GB
+- **ALB High Response Time**: Alerta quando tempo de resposta > 1s
+- **ALB Unhealthy Hosts**: Alerta quando há hosts não saudáveis
+
+### 📈 CloudWatch Agent
+As instâncias EC2 incluem o CloudWatch Agent para monitoramento detalhado:
+- **Métricas de Sistema**: CPU, memória, disco, rede
+- **Métricas Customizadas**: Namespace CWAgent
+- **Coleta Automática**: Intervalo de 5 minutos
+- **Permissões IAM**: Role dedicada para envio de métricas
+
+### 🔗 Acesso ao Dashboard
+Após o deploy, acesse o dashboard em:
+```
+https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=matcarv-infrastructure-dashboard
+```
 
 ## Segurança
 
@@ -236,6 +283,7 @@ terraform destroy
 ├── route53.tf                # Configuração do Route53
 ├── s3.tf                     # Bucket S3 para logs
 ├── cloudtrail.tf             # CloudTrail e CloudWatch Logs
+├── cloudwatch.tf             # Dashboard e Alarms do CloudWatch
 ├── setup-remote-state.sh     # Script para configurar Remote State
 ├── terraform.tfvars.example  # Exemplo de variáveis
 └── .gitignore               # Arquivos ignorados pelo Git
