@@ -251,13 +251,56 @@ https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashbo
 Os principais componentes de custo incluem:
 - EC2 t3a.small: ~$15/mês
 - RDS db.t4g.small: ~$25/mês
-- ALB: ~$20/mês
-- NAT Gateways: ~$45/mês (2 gateways)
-- EBS e outros: ~$10/mês
+- ALB: ~$22/mês
+- NAT Gateways: ~$46/mês (2 gateways)
+- EBS e outros: ~$15/mês
 
-**Total estimado**: ~$115/mês
+**Total estimado**: ~$123/mês
+
+> 📊 **Calculadora Interativa**: Abra o arquivo `cost-estimation.html` no seu navegador para uma estimativa detalhada e interativa dos custos com gráficos dinâmicos.
 
 > Use a [Calculadora de Preços AWS](https://calculator.aws) para estimativas mais precisas.
+
+## Calculadora de Custos Interativa
+
+### 💰 Estimativa Dinâmica de Custos
+A infraestrutura inclui uma calculadora interativa de custos (`cost-estimation.html`) com:
+
+#### **📊 Recursos da Calculadora:**
+- **Gráficos Dinâmicos**: Visualização em tempo real dos custos
+- **Configuração Interativa**: Ajuste de parâmetros da infraestrutura
+- **Projeções**: Custos mensais, anuais, diários e por hora
+- **Detalhamento**: Breakdown completo por recurso
+- **Responsiva**: Funciona em desktop e mobile
+
+#### **🎛️ Controles Disponíveis:**
+- **Número de Instâncias EC2**: 1-10 instâncias
+- **Tipo de Instância EC2**: t3a.small até t3a.xlarge
+- **Tipo de Instância RDS**: db.t4g.small até db.t4g.xlarge
+- **Armazenamento RDS**: 20GB até 1TB
+
+#### **📈 Gráficos Incluídos:**
+- **Pizza**: Distribuição de custos por serviço
+- **Linha**: Projeção de custos ao longo de 12 meses
+- **Tabela**: Detalhamento completo por recurso
+
+#### **💡 Como Usar:**
+1. Abra o arquivo `cost-estimation.html` no navegador
+2. Ajuste os parâmetros conforme sua necessidade
+3. Visualize os custos atualizados em tempo real
+4. Use as informações para planejamento de orçamento
+
+#### **🎯 Recursos Monitorados:**
+- EC2 Instances (Auto Scaling)
+- RDS MySQL Database
+- Application Load Balancer
+- NAT Gateways (2x)
+- Elastic IPs (2x)
+- S3 Bucket (Logs)
+- CloudTrail
+- CloudWatch (Dashboard + Alarms)
+- KMS Keys (3x)
+- Route53 Hosted Zone
 
 ## Limpeza
 
@@ -284,6 +327,7 @@ terraform destroy
 ├── s3.tf                     # Bucket S3 para logs
 ├── cloudtrail.tf             # CloudTrail e CloudWatch Logs
 ├── cloudwatch.tf             # Dashboard e Alarms do CloudWatch
+├── cost-estimation.html      # Calculadora interativa de custos
 ├── setup-remote-state.sh     # Script para configurar Remote State
 ├── terraform.tfvars.example  # Exemplo de variáveis
 └── .gitignore               # Arquivos ignorados pelo Git

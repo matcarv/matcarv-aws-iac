@@ -263,12 +263,6 @@ resource "aws_cloudwatch_dashboard" "main" {
       }
     ]
   })
-
-  tags = merge(local.common_tags, {
-    Name        = "${var.project_name}-infrastructure-dashboard"
-    Description = "CloudWatch dashboard for monitoring EC2, RDS, ALB and VPC metrics"
-    Service     = "CloudWatch"
-  })
 }
 
 # CloudWatch Alarms for Critical Metrics

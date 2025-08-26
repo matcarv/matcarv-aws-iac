@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatCarv AWS Infrastructure - Estimativa de Custos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-wrapper {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .chart-wrapper h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.4em;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-item label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .control-item input, .control-item select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .detailed-breakdown {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .detailed-breakdown h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .breakdown-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .cost-value {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ MatCarv AWS Infrastructure</h1>
+            <p>Estimativa Interativa de Custos - Região us-east-1</p>
+        </div>
+
+        <div class="content">
+            <div class="summary-cards">
+                <div class="card">
+                    <h3 id="totalMonthlyCost">$0.00</h3>
+                    <p>Custo Total Mensal</p>
+                </div>
+                <div class="card">
+                    <h3 id="totalYearlyCost">$0.00</h3>
+                    <p>Custo Total Anual</p>
+                </div>
+                <div class="card">
+                    <h3 id="dailyCost">$0.00</h3>
+                    <p>Custo Diário</p>
+                </div>
+                <div class="card">
+                    <h3 id="hourlyCost">$0.00</h3>
+                    <p>Custo por Hora</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <h3>⚙️ Configurações da Infraestrutura</h3>
+                <div class="control-group">
+                    <div class="control-item">
+                        <label for="ec2Instances">Número de Instâncias EC2:</label>
+                        <input type="number" id="ec2Instances" min="1" max="10" value="2">
+                    </div>
+                    <div class="control-item">
+                        <label for="ec2Type">Tipo de Instância EC2:</label>
+                        <select id="ec2Type">
+                            <option value="t3a.small">t3a.small</option>
+                            <option value="t3a.medium">t3a.medium</option>
+                            <option value="t3a.large">t3a.large</option>
+                            <option value="t3a.xlarge">t3a.xlarge</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="rdsType">Tipo de Instância RDS:</label>
+                        <select id="rdsType">
+                            <option value="db.t4g.small">db.t4g.small</option>
+                            <option value="db.t4g.medium">db.t4g.medium</option>
+                            <option value="db.t4g.large">db.t4g.large</option>
+                            <option value="db.t4g.xlarge">db.t4g.xlarge</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="storageSize">Armazenamento RDS (GB):</label>
+                        <input type="number" id="storageSize" min="20" max="1000" value="20">
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3>📊 Distribuição de Custos por Serviço</h3>
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3>📈 Projeção de Custos (12 meses)</h3>
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="detailed-breakdown">
+                <h3>💰 Detalhamento de Custos por Recurso</h3>
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Quantidade</th>
+                            <th>Tipo/Configuração</th>
+                            <th>Custo Mensal</th>
+                            <th>Custo Anual</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💡 <strong>Nota:</strong> Estes são valores estimados baseados nos preços da AWS para a região us-east-1. 
+            Os custos reais podem variar baseados no uso, descontos, Reserved Instances e outros fatores.</p>
+            <p style="margin-top: 10px;">📅 Última atualização: Agosto 2025 | 🏗️ Infraestrutura gerenciada por Terraform</p>
+        </div>
+    </div>
+
+    <script>
+        // Preços base (USD por mês) - us-east-1
+        const pricing = {
+            ec2: {
+                't3a.small': 15.18,
+                't3a.medium': 30.37,
+                't3a.large': 60.74,
+                't3a.xlarge': 121.47
+            },
+            rds: {
+                'db.t4g.small': 24.82,
+                'db.t4g.medium': 49.64,
+                'db.t4g.large': 99.28,
+                'db.t4g.xlarge': 198.56
+            },
+            storage: 0.115, // per GB/month
+            alb: 22.27,
+            natGateway: 45.58, // 2 NAT Gateways
+            eip: 3.65, // 2 Elastic IPs
+            s3: 2.50, // estimated for logs
+            cloudtrail: 2.00,
+            cloudwatch: 5.00,
+            kms: 3.00, // 3 keys
+            route53: 0.50
+        };
+
+        let pieChart, lineChart;
+
+        function calculateCosts() {
+            const ec2Instances = parseInt(document.getElementById('ec2Instances').value);
+            const ec2Type = document.getElementById('ec2Type').value;
+            const rdsType = document.getElementById('rdsType').value;
+            const storageSize = parseInt(document.getElementById('storageSize').value);
+
+            const costs = {
+                ec2: pricing.ec2[ec2Type] * ec2Instances,
+                rds: pricing.rds[rdsType],
+                storage: pricing.storage * storageSize,
+                alb: pricing.alb,
+                natGateway: pricing.natGateway,
+                eip: pricing.eip,
+                s3: pricing.s3,
+                cloudtrail: pricing.cloudtrail,
+                cloudwatch: pricing.cloudwatch,
+                kms: pricing.kms,
+                route53: pricing.route53
+            };
+
+            const totalMonthly = Object.values(costs).reduce((sum, cost) => sum + cost, 0);
+            const totalYearly = totalMonthly * 12;
+            const dailyCost = totalMonthly / 30;
+            const hourlyCost = totalMonthly / (30 * 24);
+
+            // Update summary cards
+            document.getElementById('totalMonthlyCost').textContent = `$${totalMonthly.toFixed(2)}`;
+            document.getElementById('totalYearlyCost').textContent = `$${totalYearly.toFixed(2)}`;
+            document.getElementById('dailyCost').textContent = `$${dailyCost.toFixed(2)}`;
+            document.getElementById('hourlyCost').textContent = `$${hourlyCost.toFixed(2)}`;
+
+            // Update breakdown table
+            updateBreakdownTable(costs, ec2Instances, ec2Type, rdsType, storageSize);
+
+            // Update charts
+            updateCharts(costs, totalMonthly);
+        }
+
+        function updateBreakdownTable(costs, ec2Instances, ec2Type, rdsType, storageSize) {
+            const tbody = document.getElementById('breakdownTableBody');
+            tbody.innerHTML = '';
+
+            const resources = [
+                { name: 'EC2 Instances', qty: ec2Instances, config: ec2Type, monthly: costs.ec2 },
+                { name: 'RDS MySQL', qty: 1, config: rdsType, monthly: costs.rds },
+                { name: 'EBS Storage', qty: storageSize, config: 'GP3', monthly: costs.storage },
+                { name: 'Application Load Balancer', qty: 1, config: 'Standard', monthly: costs.alb },
+                { name: 'NAT Gateways', qty: 2, config: 'Standard', monthly: costs.natGateway },
+                { name: 'Elastic IPs', qty: 2, config: 'Standard', monthly: costs.eip },
+                { name: 'S3 Bucket (Logs)', qty: 1, config: 'Standard', monthly: costs.s3 },
+                { name: 'CloudTrail', qty: 1, config: 'Multi-region', monthly: costs.cloudtrail },
+                { name: 'CloudWatch', qty: 1, config: 'Dashboard + Alarms', monthly: costs.cloudwatch },
+                { name: 'KMS Keys', qty: 3, config: 'Standard', monthly: costs.kms },
+                { name: 'Route53', qty: 1, config: 'Hosted Zone', monthly: costs.route53 }
+            ];
+
+            resources.forEach(resource => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${resource.name}</strong></td>
+                    <td>${resource.qty}</td>
+                    <td>${resource.config}</td>
+                    <td class="cost-value">$${resource.monthly.toFixed(2)}</td>
+                    <td class="cost-value">$${(resource.monthly * 12).toFixed(2)}</td>
+                `;
+            });
+        }
+
+        function updateCharts(costs, totalMonthly) {
+            // Pie Chart Data
+            const pieData = {
+                labels: ['EC2', 'RDS', 'ALB', 'NAT Gateways', 'Storage', 'Outros'],
+                datasets: [{
+                    data: [
+                        costs.ec2,
+                        costs.rds,
+                        costs.alb,
+                        costs.natGateway,
+                        costs.storage,
+                        costs.eip + costs.s3 + costs.cloudtrail + costs.cloudwatch + costs.kms + costs.route53
+                    ],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            };
+
+            // Line Chart Data (12 months projection)
+            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const lineData = {
+                labels: months,
+                datasets: [{
+                    label: 'Custo Mensal ($)',
+                    data: Array(12).fill(totalMonthly),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            };
+
+            // Update Pie Chart
+            if (pieChart) {
+                pieChart.data = pieData;
+                pieChart.update();
+            } else {
+                const pieCtx = document.getElementById('pieChart').getContext('2d');
+                pieChart = new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: pieData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const percentage = ((context.parsed / totalMonthly) * 100).toFixed(1);
+                                        return `${context.label}: $${context.parsed.toFixed(2)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Update Line Chart
+            if (lineChart) {
+                lineChart.data = lineData;
+                lineChart.update();
+            } else {
+                const lineCtx = document.getElementById('lineChart').getContext('2d');
+                lineChart = new Chart(lineCtx, {
+                    type: 'line',
+                    data: lineData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Event listeners
+        document.getElementById('ec2Instances').addEventListener('input', calculateCosts);
+        document.getElementById('ec2Type').addEventListener('change', calculateCosts);
+        document.getElementById('rdsType').addEventListener('change', calculateCosts);
+        document.getElementById('storageSize').addEventListener('input', calculateCosts);
+
+        // Initial calculation
+        calculateCosts();
+    </script>
+</body>
+</html>
